@@ -12,9 +12,6 @@ import curtis.Cobbleworks.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLog;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -38,15 +35,18 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+/*
+ * This item's texture and all sound effects associated with it are taken from Dota 2.
+ * */
+
 public class SuperAxe extends ItemAxe {
 	
 	//private int cd = 0;
 	private static final int maxCooldown = 900;
-	public Random rand = new Random();
 
 	public SuperAxe() {
 		super(ToolMaterial.DIAMOND);
-		//super(CommonProxy.materialStar); AHHHHHH! BUGS!
+		//super(CommonProxy.materialStar); AHHHHHH! BUUUUUUUUUUUUUUUUUG!
 		toolMaterial = CommonProxy.materialStar;
 		damageVsEntity = 3.0F;
 		attackSpeed = -1;
@@ -54,7 +54,6 @@ public class SuperAxe extends ItemAxe {
 		this.setUnlocalizedName(Cobbleworks.MODID + ".superAxe");
 		this.setRegistryName("superAxe");
 		this.setCreativeTab(CommonProxy.tabcobbleworks);
-		this.initModel();
 		GameRegistry.register(this);
 	}
 	
@@ -108,9 +107,7 @@ public class SuperAxe extends ItemAxe {
 			return true;
 		}
 		Block b = state.getBlock();
-		//System.out.println(getUnlocalizedName() + " has been used to break a(n) " + b.getUnlocalizedName());
 		if (b instanceof BlockLog) {
-			//System.out.println("it was a block of log.");
 			timber(stack, worldIn, state, pos, user, 0);
 		}
 		return true;
@@ -125,11 +122,8 @@ public class SuperAxe extends ItemAxe {
 		for (EnumFacing facing : new EnumFacing[] {EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST}) {
 			Block b2 = worldIn.getBlockState(pos.offset(facing)).getBlock();
 			if ((b2 instanceof BlockLog) && stack != null && stack.getItemDamage() < stack.getMaxDamage()) {
-				//b2.removedByPlayer(state, worldIn, pos.offset(facing), (EntityPlayer)user, true);
-				//worldIn.spawnEntityInWorld(new EntityItem(worldIn, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(b2, 1, b2.damageDropped(state))));
 				worldIn.destroyBlock(pos.offset(facing), true);
 				stack.damageItem(1, user);
-				//System.out.println("breaking, and recursing");
 				timber(stack, worldIn, state, pos.offset(facing), user, j);
 			}
 		}
@@ -137,7 +131,7 @@ public class SuperAxe extends ItemAxe {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer caster, EnumHand hand)  {
+	public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer caster, EnumHand hand) {
 		
 		if (!itemStackIn.hasTagCompound()) {
 			return new ActionResult(EnumActionResult.FAIL, itemStackIn);
@@ -174,10 +168,12 @@ public class SuperAxe extends ItemAxe {
 		EntityMantaIllusion e1 = new EntityMantaIllusion(worldIn);
 		e1.setPosition(pos1.getX(), pos1.getY(), pos1.getZ());
 		e1.setOwner(caster);
+		e1.setCustomNameTag(caster.getName());
 		
 		EntityMantaIllusion e2 = new EntityMantaIllusion(worldIn);
 		e2.setPosition(pos2.getX(), pos2.getY(), pos2.getZ());
 		e2.setOwner(caster);
+		e2.setCustomNameTag(caster.getName());
 		
 		worldIn.spawnEntityInWorld(e1);
 		worldIn.spawnEntityInWorld(e2);
@@ -186,5 +182,25 @@ public class SuperAxe extends ItemAxe {
 	@Override
 	public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
 		return slotChanged;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	@Override
+    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		if (stack.hasTagCompound()) {
+			if (stack.getTagCompound().hasKey("cd")) {
+				int cd = stack.getTagCompound().getInteger("cd");
+				if (cd > 0) {
+					tooltip.add("Cooldown remaining: " + cd + " ticks.");
+				} else {
+					tooltip.add("Ready to use. 45 second cooldown.");
+				}
+			}
+		}
+	}
+	
+	@Override
+	public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+		return false;
 	}
 }

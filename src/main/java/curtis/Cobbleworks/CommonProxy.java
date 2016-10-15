@@ -5,12 +5,13 @@ import java.io.File;
 import curtis.Cobbleworks.module.cobblegen.BlockCobbleGen;
 import curtis.Cobbleworks.module.cobblegen.GuiProxy;
 import curtis.Cobbleworks.module.cobblegen.upgrades.CobbleUpgrade;
+import curtis.Cobbleworks.module.magic.AncientStaff;
+import curtis.Cobbleworks.module.magic.EntityIceBarrage;
+import curtis.Cobbleworks.module.magic.RenderIceBarrage;
 import curtis.Cobbleworks.module.tool.EntityMantaIllusion;
+import curtis.Cobbleworks.module.tool.PocketFurnace;
 import curtis.Cobbleworks.module.tool.RenderMantaIllusion;
 import curtis.Cobbleworks.module.tool.SuperAxe;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -21,8 +22,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.EnumHelper;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -50,15 +49,22 @@ public class CommonProxy {
 	
 	public static final ToolMaterial materialStar = EnumHelper.addToolMaterial(Cobbleworks.MODID +".materialStar", 3, 9000, 12.0F, 0.5F, 1);
 	
+	//Stuff for cobble gen
 	public static BlockCobbleGen cobblegen;
 	public static CobbleUpgrade up1;
 	
+	//Stuff for tools
 	public static SoundEvent mantaSuccess;
 	public static SoundEvent cooldown;
 	public static SoundEvent illusionDeath;
+	public static SoundEvent iceBarrageCast;
+	public static SoundEvent iceBarrageImpact;
 	
 	public static SuperAxe manta;
-	public static EntityMantaIllusion emi;
+	//public static EntityMantaIllusion emi;
+	public static PocketFurnace pf;
+	public static AncientStaff ancientStaff;
+	//public static EntityIceBarrage eib;
 	
 	public void preInit(FMLPreInitializationEvent e) {
 		
@@ -75,19 +81,22 @@ public class CommonProxy {
 		
 		if (Config.enableTools) {
 			manta = new SuperAxe();
-			emi = new EntityMantaIllusion(Minecraft.getMinecraft().theWorld);
+			//emi = new EntityMantaIllusion(Minecraft.getMinecraft().theWorld);
 			EntityRegistry.registerModEntity(EntityMantaIllusion.class, "Illusion", 0, Cobbleworks.instance, 32, 1, true);
-			RenderingRegistry.registerEntityRenderingHandler(EntityMantaIllusion.class, new IRenderFactory<EntityMantaIllusion>() {
-				@Override
-				public Render<? super EntityMantaIllusion> createRenderFor(RenderManager rm) {
-					return new RenderMantaIllusion(rm);
-				}
-			});
+			//pf = new PocketFurnace();
+		}
+		
+		if (Config.enableMagic) {
+			ancientStaff = new AncientStaff();
+			//eib = new EntityIceBarrage(Minecraft.getMinecraft().theWorld);
+			EntityRegistry.registerModEntity(EntityIceBarrage.class, "iceBarrage", 1, Cobbleworks.instance, 32, 1, true);
 		}
 		
 		mantaSuccess = registerSound("MantaStyle");
 		cooldown = registerSound("cooldown");
 		illusionDeath = registerSound("illusionDeath");
+		iceBarrageCast = registerSound("iceBarrageCast");
+		iceBarrageImpact = registerSound("iceBarrageImpact");
 	}
 	
 	public void init(FMLInitializationEvent e) {
@@ -102,6 +111,7 @@ public class CommonProxy {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 3), new Object[] {"QBQ", "LUL", "QBQ", 'Q', Blocks.QUARTZ_BLOCK, 'B', Items.BLAZE_ROD, 'L', Items.LAVA_BUCKET, 'U', new ItemStack(up1, 1, 2)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 4), new Object[] {"DSD", "TUT", "GGG", 'D', "gemDiamond", 'S', Items.NETHER_STAR, 'T', Items.GHAST_TEAR, 'G', "ingotGold", 'U', new ItemStack(up1, 1, 3)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(manta), new Object[] {"ss ","sd "," i ", 's', Items.NETHER_STAR, 'd', Items.DIAMOND_AXE, 'i', Items.GOLDEN_SWORD}));
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ancientStaff), new Object[] {" pe", "pip", "dp ", 'p', "dyePurple", 'e', Items.ENDER_EYE, 'i', "ingotIron", 'd', "gemDiamond"}));
 		}
 		
 		packetHandler.registerMessage(PacketSync.PacketSyncHandler.class, PacketSync.class, packetID++, Side.SERVER);

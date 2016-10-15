@@ -10,6 +10,7 @@ public class Config {
 	
 	public static boolean enableCobblegen = true;
 	public static boolean enableTools = true;
+	public static boolean enableMagic = true;
 	public static int maxRecursiveIterations = 16;
 	public static String renderMantasAs = "STEVE";
 	
@@ -24,6 +25,7 @@ public class Config {
 			enableTools = cfg.getBoolean("enableTools", "general", enableTools, "Set this to false to disable the overpowerd tools this mod adds.");
 			maxRecursiveIterations = cfg.getInt("maxRecursiveIterations", "general", 16, 1, 255, "This will essentially limit the radius of overpowered tools.");
 			renderMantasAs = cfg.getString("renderMantasAs", "general", "STEVE", "Choose what model to give to Manta Style illusions. Can be set to STEVE or ALEX.", new String[]{"STEVE", "ALEX"});
+			enableMagic = cfg.getBoolean("enableMagic", "general", true, "Set this to false to disable magical weaponry");
 			
 		} catch (Exception donacdum) {
 			

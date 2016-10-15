@@ -40,8 +40,7 @@ public class RenderMantaIllusion extends RenderBiped<EntityMantaIllusion> {
 	@Override
 	public void doRender(EntityMantaIllusion e, double x, double y, double z, float eYaw, float partialTickTime) {
 		setModel(e);
-		this.bindEntityTexture(e);
-		
+		//this.bindEntityTexture(e);
 		super.doRender(e, x, y, z, eYaw, partialTickTime);
 	}
 	
@@ -59,12 +58,12 @@ public class RenderMantaIllusion extends RenderBiped<EntityMantaIllusion> {
 	@Override
 	protected ResourceLocation getEntityTexture(EntityMantaIllusion e) {
 		
+		
 		if ("ALEX".equals(Config.renderMantasAs)) {
 			return TEXTURE_ALEX;
 		} else {
 			return TEXTURE_STEVE;
 		}
-		
 		
 	}
 }

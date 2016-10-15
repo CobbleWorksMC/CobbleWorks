@@ -12,5 +12,15 @@
   "illusionDeath": {
     "category": "player",
     "sounds": [{"name": "cobbleworks:illusionDeath", "stream": "true"}]
+  },
+  
+  "iceBarrageCast": {
+  "category": "player",
+  "sounds": [{"name": "cobbleworks:iceBarrageCast", "stream": "true"}]
+  },
+  
+  "iceBarrageImpact": {
+  "category": "hostile",
+  "sounds": [{"name": "cobbleworks:iceBarrageImpact", "stream": "true"}]
   }
 }

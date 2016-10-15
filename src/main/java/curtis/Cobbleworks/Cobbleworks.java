@@ -23,6 +23,8 @@ public class Cobbleworks {
     @SidedProxy(clientSide = "curtis.Cobbleworks.ClientProxy", serverSide = "curtis.Cobbleworks.CommonProxy")
     public static CommonProxy proxy;
     
+    public static final Random rand = new Random();
+    
     @EventHandler
     public void preInit(FMLPreInitializationEvent e) {
     	proxy.preInit(e);

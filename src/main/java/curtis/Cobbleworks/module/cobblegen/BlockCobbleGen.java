@@ -36,8 +36,6 @@ import curtis.Cobbleworks.Cobbleworks;
 import curtis.Cobbleworks.CommonProxy;
 import curtis.Cobbleworks.module.cobblegen.upgrades.CobbleUpgrade;
 
-//import curtis.Cobbleworks.module.cobblegen.TileEntityCobbleGen;
-
 public class BlockCobbleGen extends BlockContainer {
 
 	public BlockCobbleGen() {
@@ -53,8 +51,6 @@ public class BlockCobbleGen extends BlockContainer {
 		GameRegistry.register(this);
 		GameRegistry.register(new ItemBlock(this), this.getRegistryName());
 		GameRegistry.registerTileEntity(TileEntityCobbleGen.class, Cobbleworks.MODID + "_cobblegen");
-		
-		this.initModel();
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -70,11 +66,9 @@ public class BlockCobbleGen extends BlockContainer {
 		} else {
 			if (te instanceof TileEntityCobbleGen) {
 				playerIn.openGui(Cobbleworks.instance, GuiProxy.GUI_ID_COBBLEGEN, worldIn, pos.getX(), pos.getY(), pos.getZ());
-				//System.out.println("Apparently opened a cobbleworks gui");
 				return true;
 			}
 		}
-		//System.out.println("Something acted dumb when opening the gui for a cobblegen");
 		return false;
 	}
 	

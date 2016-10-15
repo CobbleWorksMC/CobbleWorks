@@ -33,11 +33,10 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	private int ticksSinceEvent = 0; 
     private int upgradeLevel = 0;
     private static final int[] tierRequired = {0, 1, 1, 1, 2, 2, 2, 3, 3};
-	//public static final int SIZE = 9;
-    private int incrementAmount = 1;
+    private int incrementLimit = 1;
     public customEnergyStorage power = new customEnergyStorage(250000);
     private int EnergyPerTick = 0;
-    private boolean[] enabled = {true, false, false, false, false, false, false, false, false};
+    private int[] produceAmount = {1, 0, 0, 0, 0, 0, 0, 0, 0};
     private int numEnabled = 1;
 	
     public TileEntityCobbleGen() {
@@ -61,7 +60,7 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
     
 	@Override
 	public int getSizeInventory() {
-		return 9;
+		return 36;
 	}
 
 	@Override
@@ -69,6 +68,16 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	    if (index < 0 || index >= this.getSizeInventory())
 	        return null;
 	    return this.contents[index];
+	}
+	
+	public boolean isInventoryEmpty() {
+		boolean result = true;
+		for(int i = 0; i < this.getSizeInventory(); i++) {
+			if (contents[i] != null) {
+				result = false;
+			}
+		}
+		return result;
 	}
 
 	@Override
@@ -139,45 +148,50 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	
 	public void setLevel(int i) {
 		if (!worldObj.isRemote){
-			this.upgradeLevel = i;
+			upgradeLevel = i;
 			//System.out.println("Successfully upgraded CobbleGen to level: " + this.upgradeLevel);
-			if (this.upgradeLevel > 5) {
-				this.upgradeLevel = 5;
+			if (upgradeLevel > 5) {
+				upgradeLevel = 5;
 			}
-			this.ticksSinceEvent = 0;
+			ticksSinceEvent = 0;
 			switch (i){
-				case 0: this.incrementAmount = 1;	this.EnergyPerTick = 0; 	break;
+				case 0: {
+					incrementLimit = 9;
+					EnergyPerTick = 0;
+					break;
+					}
 				case 1: {
-					this.incrementAmount = 2;
-					this.EnergyPerTick = 32;
-					this.toggleProduction(1);
-					this.toggleProduction(2);
-					this.toggleProduction(3);
+					incrementLimit = 18;
+					EnergyPerTick = 250;
+					setProduction(1, 0);
+					setProduction(2, 0);
+					setProduction(3, 0);
 					break;
 				}
 				case 2: {
-					this.incrementAmount = 8;
-					this.EnergyPerTick = 64;
-					this.toggleProduction(4);
-					this.toggleProduction(5);
-					this.toggleProduction(6);
+					incrementLimit = 72;
+					EnergyPerTick = 500;
+					setProduction(4, 0);
+					setProduction(5, 0);
+					setProduction(6, 0);
 					break;
 				}
 				
 				case 3: {
-					this.incrementAmount = 16;
-					this.EnergyPerTick = 128;
-					this.toggleProduction(7);
-					this.toggleProduction(8);
+					incrementLimit = 144;
+					EnergyPerTick = 1000;
+					setProduction(7, 0);
+					setProduction(8, 0);
 					break;
 				}
-				case 4: this.incrementAmount = 32;	this.EnergyPerTick = 256; 	break;
-				case 5: this.incrementAmount = 64; 	this.EnergyPerTick = 512;	break;
+				case 4: incrementLimit = 288;	EnergyPerTick = 1500; 	break;
+				case 5: incrementLimit = 576; 	EnergyPerTick = 2000;	break;
 			}
 		}
 	}
+	
 	public int getLevel() {
-		return this.upgradeLevel;
+		return upgradeLevel;
 	}
 	
 	public int getTierRequired(int i) {
@@ -185,35 +199,30 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	}
 	
 	@Override
-	public void readFromNBT(NBTTagCompound q)
-	{
+	public void readFromNBT(NBTTagCompound q) {
 		super.readFromNBT(q);
 		
 		NBTTagList nbttaglist = q.getTagList("Items", 10);
-		this.power.setEnergyStored(q.getInteger("RF"), false);
-		this.contents = new ItemStack[this.getSizeInventory()];
-		this.incrementAmount = q.getInteger("IncrementAmount");
-		this.EnergyPerTick = q.getInteger("RF/t");
-		this.ticksSinceEvent = q.getInteger("Time");
+		power.setEnergyStored(q.getInteger("RF"), false);
+		//contents = new ItemStack[this.getSizeInventory()];
+		incrementLimit = q.getInteger("incrementLimit");
+		EnergyPerTick = q.getInteger("RF/t");
+		ticksSinceEvent = q.getInteger("Time");
 		//this.storage = q.getIntArray("storage");
-		this.upgradeLevel = q.getInteger("upgradeLevel");
+		upgradeLevel = q.getInteger("upgradeLevel");
 		//System.out.println("Power retrieved: " + q.getInteger("RF") + " RF is now " + this.power.getEnergyStored());
 		
-		for(int j = 0; j < 9; j++) {
-			this.enabled[j] = q.getBoolean("Enable" + j);
+		produceAmount = q.getIntArray("prodAmt");
+		
+		if (q.hasKey("CustomName", 8)) {
+			customName = q.getString("CustomName");
 		}
 		
-		if (q.hasKey("CustomName", 8))
-		{
-			this.customName = q.getString("CustomName");
-		}
-
-		for (int i = 0; i < nbttaglist.tagCount(); ++i)
-		{
+		for (int i = 0; i < nbttaglist.tagCount(); ++i) {
 			NBTTagCompound nbttagcompound1 = nbttaglist.getCompoundTagAt(i);
 			int j = nbttagcompound1.getByte("Slot1") & 255;
 
-			if (j >= 0 && j < this.contents.length)
+			if (j >= 0 && j < contents.length)
 			{
 				this.contents[j] = ItemStack.loadItemStackFromNBT(nbttagcompound1);
 			}
@@ -224,24 +233,20 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	public NBTTagCompound writeToNBT(NBTTagCompound q) {
 		
 		super.writeToNBT(q);
-		q.setInteger("RF", this.power.getEnergyStored());
-		q.setInteger("RF/t", this.EnergyPerTick);
-		q.setInteger("Time", this.ticksSinceEvent);
-		q.setInteger("IncrementAmount", this.incrementAmount);
-		q.setInteger("upgradeLevel", this.upgradeLevel);
+		q.setInteger("RF", power.getEnergyStored());
+		q.setInteger("RF/t", EnergyPerTick);
+		q.setInteger("Time", ticksSinceEvent);
+		q.setInteger("incrementLimit", incrementLimit);
+		q.setInteger("upgradeLevel", upgradeLevel);
 		NBTTagList nbttaglist = new NBTTagList();
 		
-		for(int j = 0; j < 9; j++) {
-			q.setBoolean("Enable" + j, this.enabled[j]);
-		}
+		q.setIntArray("prodAmt", produceAmount);
 
-		for (int i = 0; i < this.contents.length; ++i) {
-			
+		for (int i = 0; i < contents.length; ++i) {
 			if (this.contents[i] != null) {
-				
 				NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 				nbttagcompound1.setByte("Slot1", (byte)i);
-				this.contents[i].writeToNBT(nbttagcompound1);
+				contents[i].writeToNBT(nbttagcompound1);
 				nbttaglist.appendTag(nbttagcompound1);
 			}
 		}
@@ -268,7 +273,7 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	
 	public void clear() {
 	    for (int i = 0; i < this.getSizeInventory(); i++)
-	        this.setInventorySlotContents(i, null);
+	        setInventorySlotContents(i, null);
 	    
 	}
 	
@@ -296,81 +301,91 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	}
 	
 	public boolean hasPower() {
-		for(int i = 0; i < 9; i++) {
-			if(this.power.getEnergyStored() < (this.numEnabled * this.EnergyPerTick) || this.numEnabled == 0) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public boolean canProduce() {
-		boolean result = true;
-		for(int i = 0; i < 9; i++) {
-			if (contents[i] != null) {
-				if (this.contents[i].stackSize == 64 && this.enabled[i]) {
-					return false;
-				}
-				if (!this.checkStack(i, this.contents[i]) && this.enabled[i]) {
-					return false;
-				}
-			}
-		}
-		return result;
+		
+		return (power.getEnergyStored() > 9*EnergyPerTick) ? true : false;
 	}
 	
 	@Override
 	public void update() {
 		if (worldObj.isRemote) {
 			return;
-		} else {
-			if(this.hasPower() && this.ticksSinceEvent < 100){
-				this.ticksSinceEvent++;
-				for (int i = 0; i < this.getSizeInventory(); i++) {
-					if (this.enabled[i]) {
-						this.power.setEnergyStored(this.power.getEnergyStored()-this.EnergyPerTick, false);
-					}
-				}
-			}
-			
-			if(this.ticksSinceEvent == 100 && this.canProduce()){
-				this.ticksSinceEvent = 0;
-				
-				for (int i = 0; i < this.getSizeInventory(); i++) {
-					if (this.enabled[i]) {
-						if (this.contents[i] == null) {
-							switch(i) {
-							case 0: this.contents[i] = new ItemStack(Blocks.COBBLESTONE, this.incrementAmount);	break;
-							case 1: this.contents[i] = new ItemStack(Blocks.STONE, 		 this.incrementAmount); break;
-							case 2: this.contents[i] = new ItemStack(Blocks.SAND, 		 this.incrementAmount); break;
-							case 3: this.contents[i] = new ItemStack(Blocks.GLASS, 		 this.incrementAmount);	break;
-							case 4: this.contents[i] = new ItemStack(Blocks.GRAVEL, 	 this.incrementAmount); break;
-							case 5: this.contents[i] = new ItemStack(Items.FLINT, 		 this.incrementAmount); break;
-							case 6: this.contents[i] = new ItemStack(Blocks.STONEBRICK,  this.incrementAmount);	break;
-							case 7: this.contents[i] = new ItemStack(Blocks.SANDSTONE, 	 this.incrementAmount); break;
-							case 8: this.contents[i] = new ItemStack(Blocks.DIRT, 		 this.incrementAmount); break;
-							}
-						} else if (this.checkStack(i, contents[i])) {
-							this.contents[i].stackSize += this.incrementAmount;
-							if (this.contents[i].stackSize >= 64) {
-								this.contents[i].stackSize = 64;
-							}
-						}
-					}
-				} 
-			}
 		}
 		
-		if (this.ticksSinceEvent > 100 || this.ticksSinceEvent < 0) {
-			this.ticksSinceEvent = 0;
-			System.out.println("Debug time!");
+		if (power.getEnergyStored() >= EnergyPerTick && ticksSinceEvent < 100 && !allZero()) {
+			ticksSinceEvent++;
+			power.setEnergyStored((power.getEnergyStored() - EnergyPerTick), false);
+		}
+		
+		if (ticksSinceEvent == 100 && isInventoryEmpty()) {
+			for (int gg = 0; gg < 9; gg++) {
+				generate(gg);
+			}
+			ticksSinceEvent = 0;
+		}
+		
+		if (ticksSinceEvent > 100 || ticksSinceEvent < 0) {
+			ticksSinceEvent = 0;
+			System.out.println("Debug time! We've managed to make ticksSinceEvent more than 100 or less than zero.");
 		}
 		
 		IBlockState state = worldObj.getBlockState(getPos());
 		worldObj.notifyBlockUpdate(getPos(), state, state, 3);
-		//worldObj.markBlockRangeForRenderUpdate(getPos(), getPos());
 		this.markDirty();
 		return;
+	}
+	
+	//Passes in index of increment amount to look up, uses it to set stacks
+	public void generate(int offset) {
+		int make = produceAmount[offset];
+		
+		if (make >= 192) {
+			contents[(4*offset+3)] = generateHelper(offset, 64);
+			make -= 64;
+		}
+		
+		if (make >= 128) {
+			contents[(4*offset+2)] = generateHelper(offset, 64);
+			make -= 64;
+		}
+		
+		if (make >= 64) {
+			contents[(4*offset+1)] = generateHelper(offset, 64);
+			make -= 64;
+		}
+		
+		if (make > 0) {
+			contents[(4*offset)] = generateHelper(offset, make);
+			make -= 64;
+		}
+		
+		
+	}
+	
+	//Helps generate, obviously
+	public ItemStack generateHelper(int index, int amount) {
+		switch (index) {
+		case 0: return new ItemStack(Blocks.COBBLESTONE, 	amount);
+		case 1: return new ItemStack(Blocks.STONE, 			amount);
+		case 2: return new ItemStack(Blocks.SAND, 			amount);
+		case 3: return new ItemStack(Blocks.GLASS, 			amount);
+		case 4: return new ItemStack(Blocks.GRAVEL, 		amount);
+		case 5: return new ItemStack(Items.FLINT, 			amount);
+		case 6: return new ItemStack(Blocks.STONEBRICK, 	amount);
+		case 7: return new ItemStack(Blocks.SANDSTONE, 		amount);
+		case 8: return new ItemStack(Blocks.DIRT, 			amount);
+		default: return null;
+		}
+	}
+	
+	public boolean allZero() {
+		
+		for(int i = 0; i < 9; i++) {
+			if (produceAmount[i] != 0) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -396,13 +411,29 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 		return 250000;
 	}
 	
-	public void toggleProduction(int i) {
-		if(this.enabled[i]) {
-			this.numEnabled--;
-			this.enabled[i] = false;
-		} else if(!this.enabled[i] && (this.upgradeLevel >= this.tierRequired[i])) {
-			this.numEnabled++;
-			this.enabled[i] = true;
+	public void setProduction(int index, int amount) {
+		int realAmount = amount;
+		int total = 0;
+		
+		//add up total blocks produced
+		for (int i = 0; i < 9; i++) {
+			total += produceAmount[i];
+		}
+		
+		//check if total + new amount is more than the limit
+		if ((total + amount) > incrementLimit) {
+			//if it is, reduce real amount to fit the limit
+			realAmount = (incrementLimit - total);
+		}
+		
+		produceAmount[index] += realAmount;
+		
+		//typical sanity checks
+		if (produceAmount[index] < 0) {
+			produceAmount[index] = 0;
+		}
+		if (produceAmount[index] > incrementLimit) {
+			produceAmount[index] = incrementLimit;
 		}
 	}
 	
@@ -416,7 +447,6 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		//System.out.println("You are the 23059871920875th caller of the function onDataPacket()");
 		this.readSyncableDataFromNBT(pkt.getNbtCompound());
 	}
 	
@@ -433,50 +463,42 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	 }
 	
 	private void readSyncableDataFromNBT(NBTTagCompound msgNBT) {
-		this.power.setEnergyStored(msgNBT.getInteger("power"), false);
-		this.ticksSinceEvent = msgNBT.getInteger("Progress");
-		this.upgradeLevel = msgNBT.getInteger("Tier");
-		for(int i = 0; i < 9; i++) {
-			this.enabled[i] = msgNBT.getBoolean("Enabled" + i);
-		}
+		power.setEnergyStored(msgNBT.getInteger("power"), false);
+		ticksSinceEvent = msgNBT.getInteger("Progress");
+		upgradeLevel = msgNBT.getInteger("Tier");
+		produceAmount = msgNBT.getIntArray("prodAmt");
 	}
 	
 	public void writeSyncableDataToNBT(NBTTagCompound msgNBT) {
-		msgNBT.setInteger("power", this.power.getEnergyStored());
-		msgNBT.setInteger("Progress", this.ticksSinceEvent);
-		msgNBT.setInteger("Tier", this.upgradeLevel);
-		for(int i = 0; i < 9; i++) {
-			msgNBT.setBoolean("Enabled" + i, this.enabled[i]);
-		}
-		
+		msgNBT.setInteger("power", power.getEnergyStored());
+		msgNBT.setInteger("Progress", ticksSinceEvent);
+		msgNBT.setInteger("Tier", upgradeLevel);
+		msgNBT.setIntArray("prodAmt", produceAmount);
 	}
 	
 	public void receieveMessageFromClient(NBTTagCompound msgNBT) {
-		if(msgNBT.hasKey("Toggle")) {
-			int toggle = msgNBT.getInteger("Toggle");
-			this.toggleProduction(toggle);
+		if(msgNBT.hasKey("index") && msgNBT.hasKey("amount")) {
+			int index = msgNBT.getInteger("index");
+			int amount = msgNBT.getInteger("amount");
+			setProduction(index, amount);
 			this.markDirty();
+		} else {
+			System.out.println("recieveMessageFromClient acted dumb");
 		}
 		
 	}
 	
 	public int getProgress() {
-		return this.ticksSinceEvent;
-	}
-	
-	public boolean getAbility(int i){
-		return enabled[i];
+		return ticksSinceEvent;
 	}
 
 	@Override
 	public boolean canExtract() {
-		
 		return false;
 	}
 
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		
 		return ItemStackHelper.getAndRemove(this.contents, index);
 	}
 
@@ -507,5 +529,9 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 		}
 		
 		return super.getCapability(capability, facing);
+	}
+	
+	public int getProduceAmount(int i) {
+		return produceAmount[i];
 	}
 }

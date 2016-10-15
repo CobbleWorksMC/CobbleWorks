@@ -31,7 +31,7 @@ public class CobbleUpgrade extends Item {
 		this.setUnlocalizedName(Cobbleworks.MODID + ".upgrade");
 		this.setRegistryName("cobbleUpgrade");
 		this.setCreativeTab(CommonProxy.tabcobbleworks);
-		this.initModel();
+		//this.initModel();
 		GameRegistry.register(this);
 	}
 	
