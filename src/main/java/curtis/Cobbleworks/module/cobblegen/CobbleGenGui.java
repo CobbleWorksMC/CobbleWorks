@@ -54,7 +54,6 @@ public class CobbleGenGui extends GuiContainer {
 	
 	@Override
 	public void initGui() {
-		//System.out.println("called initGui() for cobblegen");
 		super.initGui();
 		this.buttonList.clear();
 		int q = 0;
@@ -72,7 +71,6 @@ public class CobbleGenGui extends GuiContainer {
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		//PacketSync.sendToServer();
 		this.rfBarHeight = (int)(52*(this.te.power.getEnergyStored()/(float)this.te.power.getMaxEnergyStored()));
 		this.progressBarHeight = (int)(52*(this.te.getProgress()/(float)100)); //Max progress is 100 ticks.
 		
@@ -111,7 +109,7 @@ public class CobbleGenGui extends GuiContainer {
 	    for (int qw = 0; qw < 9; qw++) {
 	    	if (mouseY > guiTop + 16 && mouseY < guiTop + 69) {
 	    		if (mouseX > guiLeft+34+18*qw && mouseX < guiLeft+50+18*qw) {
-	    			String str = "Generating: " +this.te.getProduceAmount(qw) + " " + this.contained[qw];
+	    			String str = "Generating: " + this.te.getProduceAmount(qw) + " " + this.contained[qw];
 	    			this.drawHoveringText(Arrays.asList(str), mouseX - guiLeft, mouseY - guiTop, fontRendererObj);
 	    		}
 	    	}

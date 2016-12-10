@@ -8,6 +8,12 @@ import curtis.Cobbleworks.module.cobblegen.upgrades.CobbleUpgrade;
 import curtis.Cobbleworks.module.magic.AncientStaff;
 import curtis.Cobbleworks.module.magic.EntityIceBarrage;
 import curtis.Cobbleworks.module.magic.RenderIceBarrage;
+import curtis.Cobbleworks.module.spawner.BlockPendulumSummoner;
+import curtis.Cobbleworks.module.spawner.BoosterPack;
+import curtis.Cobbleworks.module.spawner.ItemMobCard;
+import curtis.Cobbleworks.module.spawner.MobRegistry;
+import curtis.Cobbleworks.module.spawner.SpaceScale;
+import curtis.Cobbleworks.module.spawner.TimeScale;
 import curtis.Cobbleworks.module.tool.EntityMantaIllusion;
 import curtis.Cobbleworks.module.tool.PocketFurnace;
 import curtis.Cobbleworks.module.tool.RenderMantaIllusion;
@@ -20,6 +26,7 @@ import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -60,11 +67,19 @@ public class CommonProxy {
 	public static SoundEvent iceBarrageCast;
 	public static SoundEvent iceBarrageImpact;
 	
+	//Tools
 	public static SuperAxe manta;
-	//public static EntityMantaIllusion emi;
 	public static PocketFurnace pf;
 	public static AncientStaff ancientStaff;
-	//public static EntityIceBarrage eib;
+	
+	//Spawner
+	public static ItemMobCard PendulumMonster;
+	public static MobRegistry pendulumRegistry;
+	public static BlockPendulumSummoner summoner;
+	public static BoosterPack booster;
+	public static TimeScale timeScale;
+	public static SpaceScale spaceScale;
+	public static LootHandler lootations;
 	
 	public void preInit(FMLPreInitializationEvent e) {
 		
@@ -81,15 +96,22 @@ public class CommonProxy {
 		
 		if (Config.enableTools) {
 			manta = new SuperAxe();
-			//emi = new EntityMantaIllusion(Minecraft.getMinecraft().theWorld);
 			EntityRegistry.registerModEntity(EntityMantaIllusion.class, "Illusion", 0, Cobbleworks.instance, 32, 1, true);
 			//pf = new PocketFurnace();
 		}
 		
 		if (Config.enableMagic) {
 			ancientStaff = new AncientStaff();
-			//eib = new EntityIceBarrage(Minecraft.getMinecraft().theWorld);
 			EntityRegistry.registerModEntity(EntityIceBarrage.class, "iceBarrage", 1, Cobbleworks.instance, 32, 1, true);
+		}
+		
+		if (Config.enableSpawner) {
+			summoner = new BlockPendulumSummoner();
+			PendulumMonster = new ItemMobCard();
+			booster = new BoosterPack();
+			timeScale = new TimeScale();
+			spaceScale = new SpaceScale();
+			pendulumRegistry = new MobRegistry();
 		}
 		
 		mantaSuccess = registerSound("MantaStyle");
@@ -97,6 +119,8 @@ public class CommonProxy {
 		illusionDeath = registerSound("illusionDeath");
 		iceBarrageCast = registerSound("iceBarrageCast");
 		iceBarrageImpact = registerSound("iceBarrageImpact");
+		
+		
 	}
 	
 	public void init(FMLInitializationEvent e) {
@@ -110,14 +134,27 @@ public class CommonProxy {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 2), new Object[] {"CDC", "NUN", "CDC", 'C', Items.MAGMA_CREAM, 'D', "gemDiamond", 'N', Blocks.NETHER_BRICK, 'U', new ItemStack(up1, 1, 1)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 3), new Object[] {"QBQ", "LUL", "QBQ", 'Q', Blocks.QUARTZ_BLOCK, 'B', Items.BLAZE_ROD, 'L', Items.LAVA_BUCKET, 'U', new ItemStack(up1, 1, 2)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 4), new Object[] {"DSD", "TUT", "GGG", 'D', "gemDiamond", 'S', Items.NETHER_STAR, 'T', Items.GHAST_TEAR, 'G', "ingotGold", 'U', new ItemStack(up1, 1, 3)}));
+		}
+		
+		if (Config.enableTools) {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(manta), new Object[] {"ss ","sd "," i ", 's', Items.NETHER_STAR, 'd', Items.DIAMOND_AXE, 'i', Items.GOLDEN_SWORD}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(ancientStaff), new Object[] {" pe", "pip", "dp ", 'p', "dyePurple", 'e', Items.ENDER_EYE, 'i', "ingotIron", 'd', "gemDiamond"}));
+		}
+		
+		if (Config.enableSpawner) {
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(summoner), new Object[] {"OCO", "SRT", "OKO", 'O', Blocks.OBSIDIAN, 'K', Items.END_CRYSTAL, 'S', spaceScale, 'R', Items.NETHER_STAR, 'T', timeScale, 'C', Items.CLOCK}));
+			
+			lootations = new LootHandler();
+			MinecraftForge.EVENT_BUS.register(lootations);
 		}
 		
 		packetHandler.registerMessage(PacketSync.PacketSyncHandler.class, PacketSync.class, packetID++, Side.SERVER);
 	}
 	
 	public void postInit(FMLPostInitializationEvent e) {
+		
+		pendulumRegistry.postInitVanillaMobs();
+		
 		if (config.hasChanged()) {
 			config.save();
 		}

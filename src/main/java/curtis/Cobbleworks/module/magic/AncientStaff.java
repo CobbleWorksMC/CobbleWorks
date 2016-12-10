@@ -8,6 +8,7 @@ import curtis.Cobbleworks.module.tool.SuperAxe;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,9 +44,11 @@ public class AncientStaff extends Item {
 		this.setUnlocalizedName(Cobbleworks.MODID + ".ancientStaff");
 		this.setRegistryName("ancientStaff");
 		this.setCreativeTab(CommonProxy.tabcobbleworks);
+		this.setMaxStackSize(1);
 		GameRegistry.register(this);
 	}
-
+	
+	@SideOnly(Side.CLIENT)
 	public void initModel() {
 		ModelResourceLocation model = new ModelResourceLocation(getRegistryName(), "inventory");
 		ModelLoader.setCustomModelResourceLocation(this, 0, model);
@@ -183,16 +186,25 @@ public class AncientStaff extends Item {
 			return false;
 		}
 		
+		double kbr = 0;
 		EntityIceBarrage eib = null;
 		
 		for (EntityLivingBase target: targets) {
     		if (target != caster) {
+    			
     			DamageSource ds = DamageSource.causeIndirectMagicDamage(caster, target);
     			float damage = 2.5f + 7.5f * Cobbleworks.rand.nextFloat();
+    			
     			if (target.isImmuneToFire()) {
     				damage *= 1.5;
+    			} else if (target.isBurning()){
+    				damage *= 1.5;
+    				target.extinguish();
     			}
     			
+    			kbr = target.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).getBaseValue();
+    			
+    			target.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
     			target.attackEntityFrom(ds, damage);
     			target.worldObj.playSound(null, target.getPosition(), CommonProxy.iceBarrageImpact, SoundCategory.HOSTILE, 0.75f, 1.0f);
     			eib = new EntityIceBarrage(caster.worldObj, caster, target);
@@ -200,6 +212,8 @@ public class AncientStaff extends Item {
     			if (eib != null) {
     				caster.worldObj.spawnEntityInWorld(eib);
     			}
+    			
+    			target.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(kbr);
     		}
     	}
 		
@@ -212,6 +226,7 @@ public class AncientStaff extends Item {
 		
 		Vec3d casterEyes = caster.getPositionEyes(1.0f);
 		Vec3d casterLook = caster.getLook(1.0f);
+		System.out.println(casterLook.toString());
 		Vec3d targetVec = null;
 		
 		if (potentialTargets.contains(caster)) {

@@ -32,11 +32,11 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
     private String customName;
 	private int ticksSinceEvent = 0; 
     private int upgradeLevel = 0;
-    private static final int[] tierRequired = {0, 1, 1, 1, 2, 2, 2, 3, 3};
+    private static final int[] tierRequired = new int[] {0, 1, 1, 1, 2, 2, 2, 3, 3};
     private int incrementLimit = 1;
     public customEnergyStorage power = new customEnergyStorage(250000);
     private int EnergyPerTick = 0;
-    private int[] produceAmount = {1, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] produceAmount = new int[] {1, 0, 0, 0, 0, 0, 0, 0, 0};
     private int numEnabled = 1;
 	
     public TileEntityCobbleGen() {
@@ -274,7 +274,6 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	public void clear() {
 	    for (int i = 0; i < this.getSizeInventory(); i++)
 	        setInventorySlotContents(i, null);
-	    
 	}
 	
 	public boolean checkStack(int i, ItemStack j) {
@@ -318,7 +317,9 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 		
 		if (ticksSinceEvent == 100 && isInventoryEmpty()) {
 			for (int gg = 0; gg < 9; gg++) {
-				generate(gg);
+				if (upgradeLevel >= tierRequired[gg]) {
+					generate(gg);
+				}
 			}
 			ticksSinceEvent = 0;
 		}
@@ -357,8 +358,6 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 			contents[(4*offset)] = generateHelper(offset, make);
 			make -= 64;
 		}
-		
-		
 	}
 	
 	//Helps generate, obviously
@@ -379,8 +378,10 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	
 	public boolean allZero() {
 		
-		for(int i = 0; i < 9; i++) {
-			if (produceAmount[i] != 0) {
+		for(int i = 0; i < produceAmount.length; i++) {
+			if (upgradeLevel < tierRequired[i]) {
+				return true;
+			} else if (produceAmount[i] != 0) {
 				return false;
 			}
 		}
@@ -485,7 +486,6 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 		} else {
 			System.out.println("recieveMessageFromClient acted dumb");
 		}
-		
 	}
 	
 	public int getProgress() {
@@ -532,6 +532,9 @@ public class TileEntityCobbleGen extends TileEntity implements ITickable, IInven
 	}
 	
 	public int getProduceAmount(int i) {
+		if (i < 0 || i > 8) {
+			return 0;
+		}
 		return produceAmount[i];
 	}
 }

@@ -13,6 +13,8 @@ public class Config {
 	public static boolean enableMagic = true;
 	public static int maxRecursiveIterations = 16;
 	public static String renderMantasAs = "STEVE";
+	public static boolean enableSpawner = true;
+	public static int spawnerDelay = 600;
 	
 	public static void load() {
 		
@@ -26,6 +28,8 @@ public class Config {
 			maxRecursiveIterations = cfg.getInt("maxRecursiveIterations", "general", 16, 1, 255, "This will essentially limit the radius of overpowered tools.");
 			renderMantasAs = cfg.getString("renderMantasAs", "general", "STEVE", "Choose what model to give to Manta Style illusions. Can be set to STEVE or ALEX.", new String[]{"STEVE", "ALEX"});
 			enableMagic = cfg.getBoolean("enableMagic", "general", true, "Set this to false to disable magical weaponry");
+			enableSpawner = cfg.getBoolean("enableSpawner", "general", true, "Set this to false to disable the YuGiOh themed mob spawning system");
+			spawnerDelay = cfg.getInt("spawnerDelay", "general", 600, 1, Integer.MAX_VALUE, "If the spawner is enabled, set the delay between spawns here. You can set it to be rediculous if you want.");
 			
 		} catch (Exception donacdum) {
 			
