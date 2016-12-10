@@ -224,9 +224,9 @@ public class AncientStaff extends Item {
 		
 		List<EntityLivingBase> potentialTargets = caster.worldObj.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(caster.posX-32, caster.posY-32, caster.posZ-32, caster.posX+32, caster.posY+32, caster.posZ+32));
 		
-		Vec3d casterEyes = caster.getPositionEyes(1.0f);
+		Vec3d casterEyes = new Vec3d(caster.posX, caster.posY + (double)caster.getEyeHeight(), caster.posZ);
 		Vec3d casterLook = caster.getLook(1.0f);
-		System.out.println(casterLook.toString());
+		//System.out.println(casterLook.toString());
 		Vec3d targetVec = null;
 		
 		if (potentialTargets.contains(caster)) {
