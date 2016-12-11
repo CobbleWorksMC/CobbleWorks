@@ -239,7 +239,7 @@ public class AncientStaff extends Item {
 			EntityLivingBase target = potentialTarget;
             AxisAlignedBB axisalignedbb = target.getEntityBoundingBox().expand(target.width, target.width, target.height);
             
-            d2 = casterEyes.distanceTo(target.getPositionEyes(1.0f));
+            d2 = casterEyes.distanceTo(new Vec3d(target.posX, target.posY + (double)target.getEyeHeight(), target.posZ));
             targetVec = casterEyes.addVector(casterLook.xCoord * d2, casterLook.yCoord * d2, casterLook.zCoord * d2);
             
             if (axisalignedbb.isVecInside(targetVec)) {
