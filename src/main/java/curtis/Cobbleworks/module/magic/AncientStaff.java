@@ -110,7 +110,7 @@ public class AncientStaff extends Item {
 	
 	@SideOnly(Side.CLIENT)
 	@Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+    	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
 	tooltip.add("A fine treasure from the desert.");	
 	    if (stack.hasTagCompound()) {
 			if (stack.getTagCompound().hasKey("cd")) {
