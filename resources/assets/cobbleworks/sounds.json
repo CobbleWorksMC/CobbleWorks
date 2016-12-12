@@ -1,0 +1,26 @@
+{
+  "MantaStyle": {
+    "category": "player", 
+    "sounds": [{"name": "cobbleworks:MantaStyle", "stream": "true"}]
+  },
+  
+  "cooldown": {
+    "category": "player", 
+    "sounds": [{"name": "cobbleworks:cooldown", "stream": "true"}]
+  },
+  
+  "illusionDeath": {
+    "category": "player",
+    "sounds": [{"name": "cobbleworks:illusionDeath", "stream": "true"}]
+  },
+  
+  "iceBarrageCast": {
+  "category": "player",
+  "sounds": [{"name": "cobbleworks:iceBarrageCast", "stream": "true"}]
+  },
+  
+  "iceBarrageImpact": {
+  "category": "hostile",
+  "sounds": [{"name": "cobbleworks:iceBarrageImpact", "stream": "true"}]
+  }
+}
