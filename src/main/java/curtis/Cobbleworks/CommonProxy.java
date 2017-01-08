@@ -153,7 +153,9 @@ public class CommonProxy {
 	
 	public void postInit(FMLPostInitializationEvent e) {
 		
-		pendulumRegistry.postInitVanillaMobs();
+		if (Config.enableSpawner) {
+			pendulumRegistry.postInitVanillaMobs();
+		}
 		
 		if (config.hasChanged()) {
 			config.save();
