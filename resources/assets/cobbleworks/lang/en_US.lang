@@ -13,6 +13,7 @@ item.cobbleworks.timeScale.name=Pendulum Scale of Time
 item.cobbleworks.spaceScale.name=Pendulum Scale of Space
 
 tile.cobbleworks.cobblegen.name=Cobbleworks
+tile.cobbleworks.advgen.name=Advanced Cobbleworks
 tile.cobbleworks.pendulumSummoner.name=Pendulum Summoner
 
 entity.cobbleworks.Illusion.name=Illusion
