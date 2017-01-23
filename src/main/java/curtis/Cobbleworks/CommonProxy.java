@@ -134,6 +134,7 @@ public class CommonProxy {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 2), new Object[] {"CDC", "NUN", "CDC", 'C', Items.MAGMA_CREAM, 'D', "gemDiamond", 'N', Blocks.NETHER_BRICK, 'U', new ItemStack(up1, 1, 1)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 3), new Object[] {"QBQ", "LUL", "QBQ", 'Q', Blocks.QUARTZ_BLOCK, 'B', Items.BLAZE_ROD, 'L', Items.LAVA_BUCKET, 'U', new ItemStack(up1, 1, 2)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 4), new Object[] {"DSD", "TUT", "GGG", 'D', "gemDiamond", 'S', Items.NETHER_STAR, 'T', Items.GHAST_TEAR, 'G', "ingotGold", 'U', new ItemStack(up1, 1, 3)}));
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(advgen), new Object[] {"GSG", "BDB", "GQG", 'G', "ingotGold", 'S', Items.NETHER_STAR, 'B', Items.WATER_BUCKET, 'D', Items.DIAMOND_PICKAXE, 'Q', Blocks.QUARTZ_BLOCK}));
 		}
 		
 		if (Config.enableTools) {
