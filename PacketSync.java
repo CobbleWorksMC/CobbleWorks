@@ -63,7 +63,7 @@ public class PacketSync implements IMessage {
 		public void handle(PacketSync message, MessageContext ctx) {
 			TileEntity te = DimensionManager.getWorld(message.dimension).getTileEntity(message.pos);
 			if(te instanceof TileEntityCobbleGen) {
-				((TileEntityCobbleGen)te).receieveMessageFromClient(message.nbt);
+				((TileEntityCobbleGen)te).receiveMessageFromClient(message.nbt);
 			} 
 		}
 	}

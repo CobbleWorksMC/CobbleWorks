@@ -2,6 +2,8 @@ package curtis.Cobbleworks;
 
 import java.io.File;
 
+import curtis.Cobbleworks.module.book.ItemBook;
+import curtis.Cobbleworks.module.book.PageRegistry;
 import curtis.Cobbleworks.module.cobblegen.BlockAdvancedGen;
 import curtis.Cobbleworks.module.cobblegen.BlockCobbleGen;
 import curtis.Cobbleworks.module.cobblegen.GuiProxy;
@@ -16,7 +18,8 @@ import curtis.Cobbleworks.module.spawner.MobRegistry;
 import curtis.Cobbleworks.module.spawner.SpaceScale;
 import curtis.Cobbleworks.module.spawner.TimeScale;
 import curtis.Cobbleworks.module.tool.EntityMantaIllusion;
-import curtis.Cobbleworks.module.tool.PocketFurnace;
+import curtis.Cobbleworks.module.tool.LightSource;
+import curtis.Cobbleworks.module.tool.LightWand;
 import curtis.Cobbleworks.module.tool.RenderMantaIllusion;
 import curtis.Cobbleworks.module.tool.SuperAxe;
 import net.minecraft.creativetab.CreativeTabs;
@@ -38,6 +41,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class CommonProxy {
@@ -57,6 +61,10 @@ public class CommonProxy {
 	
 	public static final ToolMaterial materialStar = EnumHelper.addToolMaterial(Cobbleworks.MODID +".materialStar", 3, 9000, 12.0F, 0.5F, 1);
 	
+	//The Manual
+	public static ItemBook modManual;
+	public static PageRegistry manualRegistry;
+	
 	//Stuff for cobble gen
 	public static BlockCobbleGen cobblegen;
 	public static BlockAdvancedGen advgen;
@@ -71,8 +79,9 @@ public class CommonProxy {
 	
 	//Tools
 	public static SuperAxe manta;
-	public static PocketFurnace pf;
 	public static AncientStaff ancientStaff;
+	public static LightWand lightWand;
+	public static LightSource lightSource;
 	
 	//Spawner
 	public static ItemMobCard PendulumMonster;
@@ -91,6 +100,8 @@ public class CommonProxy {
 		config = new Configuration(new File(cd, "Cobbleworks.cfg"));
 		Config.load();
 		
+		modManual = new ItemBook();
+		
 		if (Config.enableCobblegen) {
 			cobblegen = new BlockCobbleGen();
 			advgen = new BlockAdvancedGen();
@@ -100,7 +111,8 @@ public class CommonProxy {
 		if (Config.enableTools) {
 			manta = new SuperAxe();
 			EntityRegistry.registerModEntity(EntityMantaIllusion.class, "Illusion", 0, Cobbleworks.instance, 32, 1, true);
-			//pf = new PocketFurnace();
+			lightWand = new LightWand();
+			lightSource = new LightSource();
 		}
 		
 		if (Config.enableMagic) {
@@ -122,13 +134,13 @@ public class CommonProxy {
 		illusionDeath = registerSound("illusionDeath");
 		iceBarrageCast = registerSound("iceBarrageCast");
 		iceBarrageImpact = registerSound("iceBarrageImpact");
-		
-		
 	}
 	
 	public void init(FMLInitializationEvent e) {
 		
 		NetworkRegistry.INSTANCE.registerGuiHandler(Cobbleworks.instance, new GuiProxy());
+		
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(modManual), new Object[] {"CCC", "SBS", "CCC", 'C', Blocks.COBBLESTONE, 'S', Blocks.STONE, 'B', Items.BOOK}));
 		
 		if (Config.enableCobblegen) {
 			GameRegistry.addRecipe(new ShapedOreRecipe(cobblegen, new Object[] {"III", "LDW", "III", 'I', "ingotIron", 'L', Items.LAVA_BUCKET, 'D', Items.DIAMOND_PICKAXE, 'W', Items.WATER_BUCKET}));
@@ -137,10 +149,12 @@ public class CommonProxy {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 2), new Object[] {"CDC", "NUN", "CDC", 'C', Items.MAGMA_CREAM, 'D', "gemDiamond", 'N', Blocks.NETHER_BRICK, 'U', new ItemStack(up1, 1, 1)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 3), new Object[] {"QBQ", "LUL", "QBQ", 'Q', Blocks.QUARTZ_BLOCK, 'B', Items.BLAZE_ROD, 'L', Items.LAVA_BUCKET, 'U', new ItemStack(up1, 1, 2)}));
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(up1, 1, 4), new Object[] {"DSD", "TUT", "GGG", 'D', "gemDiamond", 'S', Items.NETHER_STAR, 'T', Items.GHAST_TEAR, 'G', "ingotGold", 'U', new ItemStack(up1, 1, 3)}));
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(advgen), new Object[] {"GSG", "BDB", "GQG", 'G', "ingotGold", 'S', Items.NETHER_STAR, 'B', Items.WATER_BUCKET, 'D', Items.DIAMOND_PICKAXE, 'Q', Blocks.QUARTZ_BLOCK}));
 		}
 		
 		if (Config.enableTools) {
 			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(manta), new Object[] {"ss ","sd "," i ", 's', Items.NETHER_STAR, 'd', Items.DIAMOND_AXE, 'i', Items.GOLDEN_SWORD}));
+			GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(lightWand), new Object[] {"GBG", "GRG", "GRG", 'G', Items.GLOWSTONE_DUST, 'B', Blocks.GLOWSTONE, 'R', Items.BLAZE_ROD}));
 		}
 		
 		if (Config.enableSpawner) {

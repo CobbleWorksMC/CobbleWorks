@@ -5,16 +5,18 @@ item.cobbleworks.upgrade3.name=Tier 4 Upgrade
 item.cobbleworks.upgrade4.name=Tier 5 Upgrade
 
 item.cobbleworks.superAxe.name=Manta Style
-item.cobbleworks.pocketFurnace.name=Ender Furnace Remote
 item.cobbleworks.ancientStaff.name=Ancient Staff
 item.cobbleworks.mobCard.name=Pendulum Monster Card
 item.cobbleworks.boosterPack.name=Pack of Cards
 item.cobbleworks.timeScale.name=Pendulum Scale of Time
 item.cobbleworks.spaceScale.name=Pendulum Scale of Space
+item.cobbleworks.lightWand.name=Light Wand
+item.cobbleworks.guideBook.name=Cobbleworks Manual
 
 tile.cobbleworks.cobblegen.name=Cobbleworks
 tile.cobbleworks.advgen.name=Advanced Cobbleworks
 tile.cobbleworks.pendulumSummoner.name=Pendulum Summoner
+tile.cobbleworks.lightSource.name=Invisible Light
 
 entity.cobbleworks.Illusion.name=Illusion
 

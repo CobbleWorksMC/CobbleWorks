@@ -1,5 +1,6 @@
 package curtis.Cobbleworks;
 
+import curtis.Cobbleworks.module.book.PageRegistry;
 import curtis.Cobbleworks.module.cobblegen.BlockCobbleGen;
 import curtis.Cobbleworks.module.magic.EntityIceBarrage;
 import curtis.Cobbleworks.module.magic.RenderIceBarrage;
@@ -36,6 +37,10 @@ public class ClientProxy extends CommonProxy {
 			}
 		});
 		
+		modManual.initModel();
+		manualRegistry = new PageRegistry();
+		manualRegistry.launchPages();
+		
 		if (Config.enableCobblegen) {
 			cobblegen.initModel();
 			advgen.initModel();
@@ -45,6 +50,8 @@ public class ClientProxy extends CommonProxy {
 		if (Config.enableTools) {
 			manta.initModel();
 			//pf.initModel();
+			lightWand.initModel();
+			lightSource.initModel();
 		}
 		
 		if (Config.enableMagic) {
