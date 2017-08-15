@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube", 
+  "textures": {
+  "particle": "cobbleworks:blocks/customgenside",
+  "down": "cobbleworks:blocks/cobbleworksbot",
+  "up": "cobbleworks:blocks/customgentop",
+  "east": "cobbleworks:blocks/customgenside",
+  "west": "cobbleworks:blocks/customgenside",
+  "north": "cobbleworks:blocks/customgenside",
+  "south": "cobbleworks:blocks/customgenside"
+  }
+  
+}

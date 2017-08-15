@@ -1,0 +1,25 @@
+{
+  "result": {
+    "item": "cobbleworks:guideBook"
+  },
+  
+  "pattern": [
+    "CCC", 
+    "SBS", 
+    "CCC"
+  ],
+  
+  "type": "forge:ore_shaped",
+  "key": {
+    "C": {
+      "item": "minecraft:cobblestone"
+    },
+    "S": {
+      "item": "minecraft:stone", 
+      "data": 0
+    },
+    "B": {
+      "item": "minecraft:book"
+    }
+  }
+}

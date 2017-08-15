@@ -1,0 +1,30 @@
+{
+  "result": {
+    "item": "cobbleworks:cobbleUpgrade",
+    "data": 2
+  },
+  
+  "pattern": [
+    "CDC", 
+    "NUN", 
+    "CDC"
+  ],
+  
+  "type": "forge:ore_shaped",
+  "key": {
+    "C": {
+      "item": "minecraft:magma_cream"
+    },
+    "D": {
+      "type": "forge:ore_dict",
+      "ore": "gemDiamond"
+    },
+    "U": {
+      "item": "cobbleworks:cobbleUpgrade",
+      "data": 1
+    },
+    "N": {
+      "item": "minecraft:nether_brick"
+    }
+  }
+}
