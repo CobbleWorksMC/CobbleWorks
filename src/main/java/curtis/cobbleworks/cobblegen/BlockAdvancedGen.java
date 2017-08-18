@@ -11,6 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,6 +24,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -57,7 +60,13 @@ public class BlockAdvancedGen extends BlockContainer {
 			return true;
 		} else {
 			if (te instanceof TileEntityAdvancedgen) {
-				playerIn.openGui(Cobbleworks.instance, GuiProxy.GUI_ID_COBBLEGEN, worldIn, pos.getX(), pos.getY(), pos.getZ());
+				if (playerIn.getHeldItem(hand).getItem() == Items.LAVA_BUCKET && (((TileEntityAdvancedgen)te).fill(new FluidStack(FluidRegistry.LAVA, 1000), false) == 1000)) {
+					((TileEntityAdvancedgen)te).fill(new FluidStack(FluidRegistry.LAVA, 1000), true);
+					playerIn.getHeldItem(hand).setCount(playerIn.getHeldItem(hand).getCount() - 1);
+					worldIn.spawnEntity(new EntityItem(worldIn, playerIn.posX, playerIn.posY, playerIn.posZ, new ItemStack(Items.BUCKET)));
+				} else {
+					playerIn.openGui(Cobbleworks.instance, GuiProxy.GUI_ID_COBBLEGEN, worldIn, pos.getX(), pos.getY(), pos.getZ());
+				}
 				return true;
 			}
 		}

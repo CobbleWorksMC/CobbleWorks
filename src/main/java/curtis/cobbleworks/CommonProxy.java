@@ -37,7 +37,7 @@ public class CommonProxy {
 	
 	private static int packetID = 0;
 	
-	private static boolean flagCCW = false; //Tracks if the Custom Cobbleworks properly registered all its items
+	protected static boolean flagCCW = false; //Tracks if the Custom Cobbleworks properly registered all its items
 	
 	public static Configuration config;
 	public static Configuration config2;
@@ -70,9 +70,7 @@ public class CommonProxy {
 		
 		modManual = new ItemManual();
 		
-		if (TileEntityCustomgen.isActive()) {
-			flagCCW = true;
-		}
+		
 		
 		if (Config.enableCobblegen) {
 			cobblegen = new BlockCobbleGen();
@@ -82,7 +80,14 @@ public class CommonProxy {
 			advgen = new BlockAdvancedGen();
 		}
 		
-		if (Config.enableCustomgen && flagCCW) {
+		if (Config.forceCustomgen) {
+			System.out.println("WARNING: The option \"forceCustomgen\" has been enabled for the Cobbleworks configuration!");
+			System.out.println("If any crashes occur concerning the mod, please disable this and try again before reporting errors.");
+			System.out.println("Chances are something did not register properly and caused issues down the road.");
+			flagCCW = true;
+		}
+		
+		if (Config.enableCustomgen) {
 			customgen = new BlockCustomgen();
 		}
 		
@@ -94,9 +99,6 @@ public class CommonProxy {
 	public void init(FMLInitializationEvent e) {
 		
 		NetworkRegistry.INSTANCE.registerGuiHandler(Cobbleworks.instance, new GuiProxy());
-		
-		//Recipes
-		//GameRegistry.addShapedRecipe(name, group, output, params);
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
@@ -109,6 +111,9 @@ public class CommonProxy {
 			config2.save();
 		}
 		
+		if (!TileEntityCustomgen.isActive()) {
+			System.out.println("The Custom Cobbleworks will not open its GUI, nor run its update loop in this world, since it did not register all of its items properly.");
+		}
 	}
 	
 	@SubscribeEvent
@@ -123,7 +128,7 @@ public class CommonProxy {
 			event.getRegistry().register(advgen);
 		}
 		
-		if (Config.enableCustomgen && flagCCW) {
+		if (Config.enableCustomgen) {
 			event.getRegistry().register(customgen);
 		}
 		
@@ -144,7 +149,7 @@ public class CommonProxy {
 			event.getRegistry().register(new ItemBlock(advgen).setRegistryName(advgen.getRegistryName()));
 		}
 		
-		if (Config.enableCustomgen && flagCCW) {
+		if (Config.enableCustomgen) {
 			event.getRegistry().register(new ItemBlock(customgen).setRegistryName(customgen.getRegistryName()));
 		}
 		

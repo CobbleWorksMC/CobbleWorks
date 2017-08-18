@@ -1,6 +1,7 @@
 package curtis.cobbleworks.cobblegen;
 
 import curtis.cobbleworks.Config;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -9,6 +10,7 @@ public class TileEntityCustomgen extends TileEntityAdvancedgen {
 	
 	public static ItemStack[] generated = new ItemStack[9];
 	public static boolean isEnabled = false;
+	protected static float[] advLavaConsumed = new float[] {0f, 1f, .5f, .1f, .1f, 1.0f, .1f, .1f, 10f};
 	
 	/*
 	 * Only needs to be called once.
@@ -20,11 +22,22 @@ public class TileEntityCustomgen extends TileEntityAdvancedgen {
 		
 		for (String id : Config.customItems) {
 			
-			Item thing = Item.getByNameOrId(id);
+			String newId = id;
+			int meta = 0;
+			
+			if (id.contains(",")) {
+				String[] str = id.split(",");
+				newId = str[0].trim();
+				meta = Integer.parseInt(str[1].trim());
+			} else {
+				newId = id.trim();
+			}
+			
+			Item thing = Item.getByNameOrId(newId);
 			
 			if (thing != null) {
-				generated[i] = new ItemStack(thing);
-				System.out.println("Registered " + id + " to the Custom Cobbleworks.");
+				generated[i] = new ItemStack(thing, 1, meta);
+				System.out.println("Registered " + id + " to the Custom Cobbleworks as " + generated[i].getDisplayName() + ".");
 			} else {
 				System.out.println("Failed to register item: " + id + " to the Custom Cobbleworks, aborting!");
 				isEnabled = false;
@@ -33,7 +46,6 @@ public class TileEntityCustomgen extends TileEntityAdvancedgen {
 			
 			++i;
 		}
-		
 		
 		init();
 		System.out.println("Successfully registered all nine items to the Custom Cobbleworks! Woohoo!");
@@ -49,7 +61,7 @@ public class TileEntityCustomgen extends TileEntityAdvancedgen {
 		
 		for (int i = 0; i < 9; i++) {
 			tierRequired[i] = Config.customTiers[i];
-			TileEntityCustomgen.lavaConsumed[i] = ((float) Config.customLava[i]) / 1000f;
+			advLavaConsumed[i] = ((float) Config.customLava[i]) / 1000f;
 		}
 	}
 	
@@ -120,4 +132,46 @@ public class TileEntityCustomgen extends TileEntityAdvancedgen {
 		return "Tier " + this.upgradeLevel + " Custom CobbleWorks";
 	}
 	
+	@Override
+	public void update() {
+		if (world.isRemote) {
+			return;
+		}
+		
+		if (!isEnabled) {
+			return;
+		}
+		
+		if (power.getEnergyStored() >= calcRFCost() && ticksSinceEvent < 100 && !allZero() && calcLavaCost()) {
+			ticksSinceEvent++;
+			power.setEnergyStored((int)(power.getEnergyStored() - calcRFCost()), false);
+			
+			float sum = 0f;
+			
+			for (int i = 0; i < 9; i++) {
+				sum += this.advLavaConsumed[i] * (float)this.produceAmount[i];
+			}
+			
+			lava.drain((int)sum, true);
+		}
+		
+		if (ticksSinceEvent == 100 && isInventoryEmpty()) {
+			for (int gg = 0; gg < 9; gg++) {
+				if (upgradeLevel >= tierRequired[gg]) {
+					generate(gg);
+				}
+			}
+			ticksSinceEvent = 0;
+		}
+		
+		if (ticksSinceEvent > 100 || ticksSinceEvent < 0) {
+			ticksSinceEvent = 0;
+			System.out.println("Debug time! We've managed to make ticksSinceEvent more than 100 or less than zero.");
+		}
+		
+		IBlockState state = world.getBlockState(getPos());
+		world.notifyBlockUpdate(getPos(), state, state, 3);
+		this.markDirty();
+		return;
+	}
 }

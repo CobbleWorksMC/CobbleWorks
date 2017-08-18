@@ -1,5 +1,6 @@
 package curtis.cobbleworks.cobblegen;
 
+import curtis.cobbleworks.Config;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -17,7 +18,7 @@ import net.minecraftforge.fluids.capability.IFluidTankProperties;
 
 public class TileEntityAdvancedgen extends TileEntityCobblegen implements IFluidHandler {
 	
-	public FluidTank lava = new FluidTank(16000);
+	public FluidTank lava = new FluidTank(((this instanceof TileEntityCustomgen) ? Config.customLavaCapacity : Config.advLavaCapacity));
 	protected static float[] lavaConsumed = new float[] {0f, 1f, .5f, .1f, .1f, 1.0f, .1f, .1f, 10f};
 	
 	public TileEntityAdvancedgen() {
@@ -189,7 +190,7 @@ public class TileEntityAdvancedgen extends TileEntityCobblegen implements IFluid
 		return result;
 	}
 	
-	private boolean calcLavaCost() {
+	protected boolean calcLavaCost() {
 		float sum = 0f;
 		
 		for (int i = 0; i < 9; i++) {

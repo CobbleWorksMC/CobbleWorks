@@ -1,5 +1,6 @@
 package curtis.cobbleworks.cobblegen;
 
+import curtis.cobbleworks.Config;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -29,7 +30,7 @@ public class TileEntityCobblegen extends TileEntity implements ITickable, /*IInv
     protected int upgradeLevel = 0;
     protected static int[] tierRequired = new int[] {0, 1, 1, 1, 2, 2, 2, 3, 3};
     public int incrementLimit = 9;
-    public customEnergyStorage power = new customEnergyStorage(250000);
+    public customEnergyStorage power = new customEnergyStorage(Config.basicPowerCapacity);
     public int EnergyPerTick = 0;
     public int[] produceAmount = new int[] {1, 0, 0, 0, 0, 0, 0, 0, 0};
     protected int numEnabled = 1;
@@ -542,7 +543,7 @@ public class TileEntityCobblegen extends TileEntity implements ITickable, /*IInv
 
 	@Override
 	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-		return null;
+		return stack;
 	}
 
 	@Override
