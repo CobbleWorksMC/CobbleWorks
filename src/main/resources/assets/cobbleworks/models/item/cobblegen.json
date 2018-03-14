@@ -1,0 +1,13 @@
+{
+  "parent": "block/cube", 
+  "textures": {
+  "particle": "cobbleworks:blocks/cobbleworksside",
+  "down": "cobbleworks:blocks/cobbleworksbot",
+  "up": "cobbleworks:blocks/cobbleworkstop",
+  "east": "cobbleworks:blocks/cobbleworksside",
+  "west": "cobbleworks:blocks/cobbleworksside",
+  "north": "cobbleworks:blocks/cobbleworksside",
+  "south": "cobbleworks:blocks/cobbleworksside"
+  }
+  
+}

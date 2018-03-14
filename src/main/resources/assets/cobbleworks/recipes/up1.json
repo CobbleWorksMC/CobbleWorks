@@ -1,0 +1,33 @@
+{
+  "result": {
+    "item": "cobbleworks:cobbleUpgrade",
+    "data": 0
+  },
+  
+  "pattern": [
+    "IGI",
+    "FCP",
+    "IGI"
+  ],
+  
+  "type": "forge:ore_shaped",
+  "key": {
+    "G": {
+      "type": "forge:ore_dict",
+      "ore": "ingotGold"
+    },
+    "I": {
+      "type": "forge:ore_dict",
+      "ore": "ingotIron"
+    },
+    "F": {
+      "item": "minecraft:furnace"
+    },
+    "C": {
+      "item": "minecraft:coal_block"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    }
+  }
+}

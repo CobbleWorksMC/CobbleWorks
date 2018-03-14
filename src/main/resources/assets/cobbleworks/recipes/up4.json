@@ -1,0 +1,30 @@
+{
+  "result": {
+    "item": "cobbleworks:cobbleUpgrade",
+    "data": 3
+  },
+  
+  "pattern": [
+    "QBQ", 
+    "LUL", 
+    "QBQ"
+  ],
+  
+  "type": "forge:ore_shaped",
+  "key": {
+    "Q": {
+      "item": "minecraft:quartz_block", 
+      "data": 0
+    },
+    "B": {
+      "item": "minecraft:blaze_rod"
+    },
+    "U": {
+      "item": "cobbleworks:cobbleUpgrade",
+      "data": 2
+    },
+    "L": {
+      "item": "minecraft:lava_bucket"
+    }
+  }
+}
